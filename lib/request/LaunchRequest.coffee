@@ -2,10 +2,8 @@ Request = require './Request'
 
 module.exports = class LaunchRequest extends Request
 
-  constructor : ( opts ) ->
-    super opts
+  init: =>
     @url = "/launch"
   
 
-  
   

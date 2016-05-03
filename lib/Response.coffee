@@ -1,4 +1,4 @@
-OutputSpeech = require '../outputSpeech'
+OutputSpeech = require './outputSpeech/index'
 
 module.exports = class Response
   constructor : ( opts = {} ) ->
@@ -9,9 +9,9 @@ module.exports = class Response
       response :
         shouldEndSession : true
 
-    @out = opts.out or throw new Error ("missing option: out")
-    @app = opts.app or throw new Error ("missing option: app")
-    @req = opts.req or throw new Error ("missing option: req")
+    for o in [ "out", "app", "req" ]
+      @[ o ] = opts[ o ] or throw new Error ("missing option: #{o}")
+
     @session( @req.sessionAttributes ) if @app.get( "persist session" )
 
   version : => @data.version
@@ -64,27 +64,6 @@ module.exports = class Response
     return @ssml str if format is "SSML"
     return @text str if format is "PlainText"
     @req.next new Error( "unknown format: #{format}" )
-
-  render : ( view, options, cb ) =>
-    req = @req
-    opt = options or {}
-
-    if typeof options is 'function'
-      done = options
-      opts = {}
-
-    opts._locals = @locals
-
-    unless done?
-      done = ( err, str ) =>
-        return req.next err if err?
-
-        format = @app.get( "format" )
-        return @ssml str if format is "SSML"
-        return @text str if format is "PlainText"
-        req.next new Error( "unknown format: #{format}" )
-
-    @app.render view, opts, done
 
   end : => @out()
     

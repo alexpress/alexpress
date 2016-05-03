@@ -1,14 +1,11 @@
 'use strict'
 Request = require './request'
-Response = require './response/Response'
-View = require './View'
+Response = require './Response'
 
-### istanbul ignore next ###
-defer = if typeof setImmediate == 'function' then setImmediate else (( fn ) ->
-  process.nextTick fn.bind.apply( fn, arguments )
-)
+defer = setImmediate or ( fn ) -> process.nextTick fn.bind.apply( fn, arguments )
 
 class App
+
   constructor : ( opts = {} ) ->
     @route = "/"
     @stack = []
@@ -17,7 +14,7 @@ class App
     @settings =
       views : "#{process.cwd()}/views"
       "format" : "PlainText"
-      "json spaces" : opts["json spaces"] or null
+      "json spaces" : opts[ "json spaces" ] or null
       "json replacer" : null
       "persist session" : true
 
@@ -53,8 +50,7 @@ class App
     path = route
     handle = fn
 
-    if handle.length is 1
-      handle = handle[ 0 ]
+    handle = handle[ 0 ] if handle.length is 1
 
     if Array.isArray handle
       if handle.length is 1
@@ -116,9 +112,7 @@ class App
       layer = stack[ index++ ]
 
       # all done
-      if !layer
-        defer done, err
-        return
+      return defer done, err if !layer
 
       # route data
       #    path = parseUrl( req ).pathname or '/'
@@ -136,6 +130,7 @@ class App
       if route.length != 0 and route != '/'
         removed = route
         req.url = protohost + req.url.substr( protohost.length + removed.length )
+
         # ensure leading slash
         if !protohost and req.url[ 0 ] != '/'
           req.url = '/' + req.url
@@ -151,7 +146,6 @@ class App
   # aws lambda handler
   #
   ###
-
   handler : ( event, context, cb ) =>
     throw new Error( "Old format not supported. Use with node 4.4" ) unless arguments.length is 3
 
@@ -167,42 +161,6 @@ class App
     res = new Response out : out, app : @, req : req
     @handle req, res, out
 
-  render : ( name, options, callback ) =>
-    cache = @cache
-    done = callback
-    engines = @engines
-    opts = options
-    renderOptions = {}
-    view = undefined
-
-    # support callback function as second arg
-    if typeof options == 'function'
-      done = options
-      opts = {}
-
-    # merge app.locals
-    merge renderOptions, @locals
-
-    # merge options._locals
-    if opts._locals
-      merge renderOptions, opts._locals
-
-    # merge options
-    merge renderOptions, opts
-
-    view = new View( name,
-      defaultEngine : @get( 'view engine' )
-      root : @get( 'views' )
-      engines : engines )
-
-    if !view.path
-      dirs = if Array.isArray( view.root ) and view.root.length > 1 then 'directories "' + view.root.slice( 0, -1 ).join( '", "' ) + '" or "' + view.root[ view.root.length - 1 ] + '"' else 'directory "' + view.root + '"'
-      err = new Error( 'Failed to lookup view "' + name + '" in views ' + dirs )
-      err.view = view
-      return done( err )
-
-    tryRender view, renderOptions, done
-
 ###*
 # Invoke a route handle.
 # @private
@@ -211,7 +169,6 @@ call = ( handle, route, err, req, res, next ) ->
   arity = handle.length
   error = err
   hasError = Boolean( err )
-  #  debug '%s %s : %s', handle.name or '<anonymous>', route, req.originalUrl
 
   req.next = next
   try
