@@ -19,14 +19,12 @@ describe "intent schema", ->
     it "default output without middleware", ( done ) ->
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         res.version.should.equal "1.0"
         done()
 
     it "close the session", ( done ) ->
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         res.response.shouldEndSession.should.equal true
         done()
 
@@ -37,7 +35,6 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         res.response.outputSpeech.type.should.equal "PlainText"
         res.response.outputSpeech.text.should.equal "test"
         done()
@@ -50,7 +47,7 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.outputSpeech.type.should.equal "SSML"
         res.response.outputSpeech.ssml.should.equal "<speak>#{str}</speak>"
         done()
@@ -64,7 +61,7 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.reprompt.outputSpeech.text.should.equal "b"
         res.response.outputSpeech.text.should.equal "a"
         done()
@@ -76,7 +73,7 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.reprompt.outputSpeech.text.should.equal "b"
         res.response.outputSpeech.text.should.equal "a"
         done()
@@ -86,7 +83,7 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.shouldEndSession.should.equal true
         done()
 
@@ -95,7 +92,7 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.shouldEndSession.should.equal false
         done()
 
@@ -117,7 +114,7 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.outputSpeech.type.should.equal "PlainText"
         res.response.outputSpeech.text.should.equal str
         done()
@@ -135,7 +132,7 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.sessionAttributes.supportedHoroscopePeriods.daily.should.equal true
         res.response.outputSpeech.text.should.equal horoscopes.virgo
         res.response.shouldEndSession.should.equal false
@@ -156,7 +153,7 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.outputSpeech.text.should.equal "wassup?"
         done()
 
@@ -184,7 +181,7 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.outputSpeech.text.should.equal "1 2 3"
         done()
 
@@ -216,7 +213,7 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
+
         res.response.shouldEndSession.should.equal false
         done()
 
@@ -227,7 +224,6 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         res.sessionAttributes.abraca.should.equal "dabra"
         done()
 
@@ -237,7 +233,6 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         res.sessionAttributes.test.should.equal 123
         done()
 
@@ -249,7 +244,6 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-        res = JSON.parse res
         should( res.sessionAttributes.test ).equal undefined
         done()
 

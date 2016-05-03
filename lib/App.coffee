@@ -14,8 +14,6 @@ class App
     @settings =
       views : "#{process.cwd()}/views"
       "format" : "PlainText"
-      "json spaces" : opts[ "json spaces" ] or null
-      "json replacer" : null
       "persist session" : true
 
   ###
@@ -156,7 +154,7 @@ class App
     spaces = @get "json spaces"
     out = ( err ) ->
       return cb err if err?
-      cb null, JSON.stringify res.data, replacer, spaces
+      cb null, res.data
 
     res = new Response out : out, app : @, req : req
     @handle req, res, out
