@@ -1,14 +1,13 @@
 {
   "name": "alexa-express",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/venkatperi/alexa-express.git"
   },
   "preferGlobal": false,
   "description": "Create Amazon Alexa apps with express-like middleware",
-  "dependencies": {
-  },
+  "dependencies": {},
   "engines": {
     "node": ">= 0.6.0",
     "npm": ">= 1.0.0"
