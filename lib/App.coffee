@@ -15,6 +15,8 @@ class App
       views : "#{process.cwd()}/views"
       "format" : "PlainText"
       "persist session" : true
+      "log group" : null
+      "log stream" : null
 
   ###
   # Returns the value of name app setting, where name is one of
@@ -146,6 +148,9 @@ class App
   ###
   handler : ( event, context, cb ) =>
     throw new Error( "Old format not supported. Use with node 4.4" ) unless arguments.length is 3
+    if context?
+      context.logGroupName = @get "log group" if @log( "log group" )?
+      context.logStreamName = @get "log stream" if @log( "log stream" )?
 
     req = Request.create type : event.request.type, original : event
     req.app = @
