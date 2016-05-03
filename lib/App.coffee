@@ -149,8 +149,8 @@ class App
   handler : ( event, context, cb ) =>
     throw new Error( "Old format not supported. Use with node 4.4" ) unless arguments.length is 3
     if context?
-      context.logGroupName = @get "log group" if @log( "log group" )?
-      context.logStreamName = @get "log stream" if @log( "log stream" )?
+      context.logGroupName = @get "log group" if @get( "log group" )?
+      context.logStreamName = @get "log stream" if @get( "log stream" )?
 
     req = Request.create type : event.request.type, original : event
     req.app = @

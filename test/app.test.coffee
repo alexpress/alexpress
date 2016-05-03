@@ -12,12 +12,12 @@ app = undefined
 describe "intent schema", ->
 
   beforeEach ->
-    app = new App()
+    app = new App "log group" : "group", "log stream":"stream"
 
   describe "defaults", ->
 
     it "default output without middleware", ( done ) ->
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.handler request( "horoscope" ), {}, ( err, res ) ->
         return done err if err?
         res.version.should.equal "1.0"
         done()
