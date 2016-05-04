@@ -7,7 +7,10 @@
   },
   "preferGlobal": false,
   "description": "Create Amazon Alexa apps with express-like middleware",
-  "dependencies": {},
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "dot": "^1.0.3"
+  },
   "engines": {
     "node": ">= 0.6.0",
     "npm": ">= 1.0.0"

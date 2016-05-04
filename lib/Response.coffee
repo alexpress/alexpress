@@ -1,4 +1,6 @@
 OutputSpeech = require './outputSpeech/index'
+Speech = require './Speech'
+merge = require './util/merge'
 
 module.exports = class Response
   constructor : ( opts = {} ) ->
@@ -61,10 +63,20 @@ module.exports = class Response
     @reprompt args[ 1 ] if args.length > 1
 
     str = args[ 0 ]
-    format = @app.get( "format" )
+    @sendWithFormat args[ 0 ], @app.get( "format" )
+
+  sendWithFormat : ( str, format ) =>
     return @ssml str if format is "SSML"
     return @text str if format is "PlainText"
     @req.next new Error( "unknown format: #{format}" )
+
+  render : ( name, locals ) =>
+    data = merge {}, @data.sessionAttributes
+    data = merge data, locals
+    s = new Speech name : name, app : @app
+    s.render data
+    .then ( str ) =>
+      @sendWithFormat str, s.format
 
   end : =>
     @out()

@@ -4,7 +4,6 @@ assert = require( "assert" )
 path = require 'path'
 horoscopes = require './fixtures/horoscopes'
 
-txt = ( name ) -> require path.join __dirname, "fixtures", "text", "#{name}.txt"
 request = ( name ) -> require path.join __dirname, "fixtures", "request", "#{name}.json"
 
 class Ctx extends SessionContext
@@ -15,10 +14,10 @@ class Ctx extends SessionContext
 
 app = undefined
 
-describe "intent schema", ->
+describe "alexa-express", ->
 
   beforeEach ->
-    app = new App "log group" : "group", "log stream" : "stream"
+    app = new App
 
   describe "defaults", ->
 
@@ -88,7 +87,6 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.shouldEndSession.should.equal true
         done()
 
@@ -97,7 +95,6 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.shouldEndSession.should.equal false
         done()
 
@@ -119,7 +116,6 @@ describe "intent schema", ->
 
       app.handler request( "launch" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.outputSpeech.type.should.equal "PlainText"
         res.response.outputSpeech.text.should.equal str
         done()
@@ -137,7 +133,6 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-
         res.sessionAttributes.supportedHoroscopePeriods.daily.should.equal true
         res.response.outputSpeech.text.should.equal horoscopes.virgo
         res.response.shouldEndSession.should.equal false
@@ -158,7 +153,6 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.outputSpeech.text.should.equal "wassup?"
         done()
 
@@ -186,7 +180,6 @@ describe "intent schema", ->
 
       app.handler request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.outputSpeech.text.should.equal "1 2 3"
         done()
 
@@ -229,7 +222,6 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.shouldEndSession.should.equal false
         done()
 
@@ -258,7 +250,6 @@ describe "intent schema", ->
         res.sessionAttributes.name.should.equal "test"
         done()
 
-  describe "context", ->
 
 
 

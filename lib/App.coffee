@@ -10,12 +10,11 @@ class App
     @route = "/"
     @stack = []
     @cache = {}
+    @locals = {}
     @settings =
-      views : "#{process.cwd()}/views"
+      "speech" : "#{process.cwd()}/speech"
       "format" : "PlainText"
       "persist session" : true
-      "log group" : null
-      "log stream" : null
 
   ###
   # Returns the value of name app setting, where name is one of
@@ -158,7 +157,7 @@ class App
       return cb err if err?
       cb null, res.data
 
-    res = new Response app : @, out: out
+    res = new Response app : @, out : out
     @handle req, res, out
 
 ###*
