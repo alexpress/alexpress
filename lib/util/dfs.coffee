@@ -7,6 +7,7 @@ methods = [ "access", "appendFile", "chmod", "chown", "fchmod", "fchown", "fdata
   "symlink", "truncate", "unlink", "utimes", "write", "writeFile" ]
 
 dfs = {}
-dfs[ m ] = Promise.promisify fs[ m ] for m in methods
+for m in methods
+  dfs[ m ] = Promise.promisify fs[ m ]  if typeof fs[ m ] is 'function'
 
 module.exports = dfs
