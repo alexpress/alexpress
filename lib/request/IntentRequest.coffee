@@ -9,7 +9,8 @@ module.exports = class IntentRequest extends Request
     @url = "/intent/#{@name}"
 
   slot: (name) =>
-    @original.request.intent.slots[name].value
+    return unless @original.request.intent.slots?
+    @original.request.intent.slots[name]?.value
 
     
   

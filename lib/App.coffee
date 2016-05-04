@@ -10,7 +10,6 @@ class App
     @route = "/"
     @stack = []
     @cache = {}
-    @parent = opts.parent or null
     @settings =
       views : "#{process.cwd()}/views"
       "format" : "PlainText"
@@ -29,6 +28,10 @@ class App
   # strings in the app settings table.
   ###
   set : ( name, value ) => @settings[ name ] = value
+
+  last : ( fn ) =>
+    @endApp = new App() unless @endApp?
+    @endApp.use fn
 
   ###
   # Utilize the given middleware `handle` to the given `route`,
@@ -56,7 +59,7 @@ class App
       if handle.length is 1
         handle = handle[ 0 ]
       else
-        sub = new App parent : @
+        sub = new App
         sub.use h for h in handle
         handle = sub
 
@@ -148,20 +151,14 @@ class App
   ###
   handler : ( event, context, cb ) =>
     throw new Error( "Old format not supported. Use with node 4.4" ) unless arguments.length is 3
-    if context?
-      context.logGroupName = @get "log group" if @get( "log group" )?
-      context.logStreamName = @get "log stream" if @get( "log stream" )?
 
-    req = Request.create type : event.request.type, original : event
-    req.app = @
+    req = Request.create type : event.request.type, original : event, app : @
 
-    replacer = @get "json replacer"
-    spaces = @get "json spaces"
     out = ( err ) ->
       return cb err if err?
       cb null, res.data
 
-    res = new Response out : out, app : @, req : req
+    res = new Response app : @, out: out
     @handle req, res, out
 
 ###*

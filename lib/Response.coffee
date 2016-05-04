@@ -2,19 +2,20 @@ OutputSpeech = require './outputSpeech/index'
 
 module.exports = class Response
   constructor : ( opts = {} ) ->
-    @locals = {}
     @data =
       version : "1.0"
       sessionAttributes : {}
       response :
         shouldEndSession : true
 
-    for o in [ "out", "app", "req" ]
+    for o in [ "app", "out" ]
       @[ o ] = opts[ o ] or throw new Error ("missing option: #{o}")
 
-    @session( @req.sessionAttributes ) if @app.get( "persist session" )
+    for o in [ "req" ]
+      @[ o ] = @app[ o ]
 
-  version : => @data.version
+  version : =>
+    @data.version
 
   keepAlive : ( val ) =>
     return !@data.response.shouldEndSession if typeof val is 'undefined'
@@ -65,5 +66,6 @@ module.exports = class Response
     return @text str if format is "PlainText"
     @req.next new Error( "unknown format: #{format}" )
 
-  end : => @out()
+  end : =>
+    @out()
     

@@ -1,6 +1,6 @@
 should = require( "should" )
 assert = require( "assert" )
-App = require( '../index' )
+{App, persistSession, SessionContext}= require( '../index' )
 path = require 'path'
 horoscopes = require './fixtures/horoscopes'
 
@@ -12,7 +12,7 @@ app = undefined
 describe "intent schema", ->
 
   beforeEach ->
-    app = new App "log group" : "group", "log stream":"stream"
+    app = new App "log group" : "group", "log stream" : "stream"
 
   describe "defaults", ->
 
@@ -185,6 +185,17 @@ describe "intent schema", ->
         res.response.outputSpeech.text.should.equal "1 2 3"
         done()
 
+    it "persist session attributes", ( done ) ->
+      app.use persistSession
+
+      app.use "/launch", ( req, res, next ) ->
+        res.ask "wassup?"
+
+      app.handler request( "launch" ), null, ( err, res ) ->
+        return done err if err?
+        res.sessionAttributes.test.should.equal 123
+        done()
+
   describe "handle errors", ->
     it "in the callback", ( done ) ->
       app.use ( req, res, next ) ->
@@ -227,25 +238,23 @@ describe "intent schema", ->
         res.sessionAttributes.abraca.should.equal "dabra"
         done()
 
-    it "session attributes persist, by default", ( done ) ->
-      app.use "/launch", ( req, res, next ) ->
+  describe "context", ->
+    it "attach session context object", ( done ) ->
+      app.use ( req, res, next ) ->
+        new SessionContext req, res
+        console.log req.context.name()
+        next()
+
+      app.use "/intent/amazon/help", ( req, res, next ) ->
+        req.context.name "test"
         res.ask "wassup?"
 
-      app.handler request( "launch" ), null, ( err, res ) ->
+      app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-        res.sessionAttributes.test.should.equal 123
+        res.sessionAttributes.name.should.equal "test"
         done()
 
-    it "don't persist session attributes", ( done ) ->
-      app.set "persist session", false
-
-      app.use "/launch", ( req, res, next ) ->
-        res.ask "wassup?"
-
-      app.handler request( "launch" ), null, ( err, res ) ->
-        return done err if err?
-        should( res.sessionAttributes.test ).equal undefined
-        done()
+  describe "context", ->
 
 
 
