@@ -7,6 +7,12 @@ horoscopes = require './fixtures/horoscopes'
 txt = ( name ) -> require path.join __dirname, "fixtures", "text", "#{name}.txt"
 request = ( name ) -> require path.join __dirname, "fixtures", "request", "#{name}.json"
 
+class Ctx extends SessionContext
+  init : =>
+    @fields =
+      name : undefined
+    super()
+
 app = undefined
 
 describe "intent schema", ->
@@ -61,7 +67,6 @@ describe "intent schema", ->
 
       app.handler request( "help" ), null, ( err, res ) ->
         return done err if err?
-
         res.response.reprompt.outputSpeech.text.should.equal "b"
         res.response.outputSpeech.text.should.equal "a"
         done()
@@ -241,8 +246,7 @@ describe "intent schema", ->
   describe "context", ->
     it "attach session context object", ( done ) ->
       app.use ( req, res, next ) ->
-        new SessionContext req, res
-        console.log req.context.name()
+        new Ctx req, res
         next()
 
       app.use "/intent/amazon/help", ( req, res, next ) ->
