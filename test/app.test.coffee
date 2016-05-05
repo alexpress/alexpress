@@ -1,23 +1,23 @@
 should = require( "should" )
 assert = require( "assert" )
-{App, persistSession, SessionContext}= require( '../index' )
+alexpress = require '../index'
 path = require 'path'
 horoscopes = require './fixtures/horoscopes'
 
 request = ( name ) -> require path.join __dirname, "fixtures", "request", "#{name}.json"
 
-class Ctx extends SessionContext
-  init : =>
-    @fields =
-      name : undefined
-    super()
+#class Ctx extends SessionContext
+#  init : =>
+#    @fields =
+#      name : undefined
+#    super()
 
 app = undefined
 
-describe "alexa-express", ->
+describe "alexpress", ->
 
   beforeEach ->
-    app = new App
+    app = alexpress()
 
   describe "defaults", ->
 
@@ -183,16 +183,16 @@ describe "alexa-express", ->
         res.response.outputSpeech.text.should.equal "1 2 3"
         done()
 
-    it "persist session attributes", ( done ) ->
-      app.use persistSession
-
-      app.use "/launch", ( req, res, next ) ->
-        res.ask "wassup?"
-
-      app.handler request( "launch" ), null, ( err, res ) ->
-        return done err if err?
-        res.sessionAttributes.test.should.equal 123
-        done()
+#    it "persist session attributes", ( done ) ->
+#      app.use persistSession
+#
+#      app.use "/launch", ( req, res, next ) ->
+#        res.ask "wassup?"
+#
+#      app.handler request( "launch" ), null, ( err, res ) ->
+#        return done err if err?
+#        res.sessionAttributes.test.should.equal 123
+#        done()
 
   describe "handle errors", ->
     it "in the callback", ( done ) ->
@@ -236,19 +236,19 @@ describe "alexa-express", ->
         done()
 
   describe "context", ->
-    it "attach session context object", ( done ) ->
-      app.use ( req, res, next ) ->
-        new Ctx req, res
-        next()
-
-      app.use "/intent/amazon/help", ( req, res, next ) ->
-        req.context.name "test"
-        res.ask "wassup?"
-
-      app.handler request( "help" ), null, ( err, res ) ->
-        return done err if err?
-        res.sessionAttributes.name.should.equal "test"
-        done()
+#    it "attach session context object", ( done ) ->
+#      app.use ( req, res, next ) ->
+#        new Ctx req, res
+#        next()
+#
+#      app.use "/intent/amazon/help", ( req, res, next ) ->
+#        req.context.name "test"
+#        res.ask "wassup?"
+#
+#      app.handler request( "help" ), null, ( err, res ) ->
+#        return done err if err?
+#        res.sessionAttributes.name.should.equal "test"
+#        done()
 
 
 

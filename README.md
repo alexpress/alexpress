@@ -8,11 +8,10 @@ Install with npm
 npm install alexa-express
 ```
 
-## Example
+## Examples
 ### Create app
 ```coffeescript
 app = new require("alexa-express")()
-module.exports = app.handler
 ```
 
 ### Handle `LaunchRequest`
@@ -37,3 +36,6 @@ app.use "/intent/amazon/help", ( req, res, next ) ->
 app.use "/intent/startGame", ( req, res, next ) ->
   res.ask "What do you want to play?"
 ```
+
+## API
+

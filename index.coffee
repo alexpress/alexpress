@@ -1,4 +1,6 @@
-module.exports =
-  App : require "./lib/App"
-  persistSession : require './lib/middleware/persistSession'
-  SessionContext : require './lib/middleware/SessionContext' 
+App = require "./lib/App"
+alexpress = ( opts ) ->
+  new App opts
+
+module.exports = alexpress
+
