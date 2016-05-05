@@ -9,7 +9,6 @@ class App
   constructor : ( opts = {} ) ->
     @route = "/"
     @stack = []
-    @cache = {}
     @locals = {}
     @settings =
       "speech" : "#{process.cwd()}/speech"
@@ -26,10 +25,6 @@ class App
   # strings in the app settings table.
   ###
   set : ( name, value ) => @settings[ name ] = value
-
-  last : ( fn ) =>
-    @endApp = new App() unless @endApp?
-    @endApp.use fn
 
   ###
   # Utilize the given middleware `handle` to the given `route`,
