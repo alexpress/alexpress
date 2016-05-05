@@ -8,10 +8,7 @@ module.exports = class IntentRequest extends Request
     @name = @name.replace "AMAZON.", "amazon/"
     @url = "/intent/#{@name}"
 
-  slot: (name) =>
-    return unless @original.request.intent.slots?
-    @original.request.intent.slots[name]?.value
 
-    
+
   
   

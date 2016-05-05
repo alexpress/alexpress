@@ -19,6 +19,12 @@ module.exports = class Request extends TypedClass
 
   init : =>
 
+  slots : =>
+    @original.request.intent?.slots or {}
+
+  slot : ( name ) =>
+    @slots()[ name ]?.value
+
   session : ( name ) =>
     @sessionAttributes[ name ]
 

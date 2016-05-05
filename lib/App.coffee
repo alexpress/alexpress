@@ -14,7 +14,6 @@ class App
     @settings =
       "speech" : "#{process.cwd()}/speech"
       "format" : "PlainText"
-      "persist session" : true
 
   ###
   # Returns the value of name app setting, where name is one of
