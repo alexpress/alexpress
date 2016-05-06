@@ -1,18 +1,18 @@
-'use strict'
 Request = require './request'
 Response = require './Response'
+nodeifyContext = require './util/nodeify-lambda-context'
 
 defer = setImmediate or ( fn ) -> process.nextTick fn.bind.apply( fn, arguments )
 
 class App
 
-  constructor : ( opts = {} ) ->
+  constructor : (  ) ->
     @route = "/"
     @stack = []
-    @locals = {}
     @settings =
       "speech" : "#{process.cwd()}/speech"
       "format" : "PlainText"
+      'keep alive' : false
 
   ###
   # Returns the value of name app setting, where name is one of
@@ -28,14 +28,10 @@ class App
 
   ###
   # Utilize the given middleware `handle` to the given `route`,
-  # defaulting to _/_. This "route" is the mount-point for the
-  # middleware, when given a value other than _/_ the middleware
+  # defaulting to '/'. This "route" is the mount-point for the
+  # middleware, when given a value other than '/' the middleware
   # is only effective when that segment is present in the request's
   # pathname.
-  #
-  # For example if we were to mount a function at _/admin_, it would
-  # be invoked on _/admin_, and _/admin/settings_, however it would
-  # not be invoked for _/_, or _/posts_.
   #
   # @param {String|Function|Server} route, callback or server
   # @param {Function|Server} callback or server
@@ -139,17 +135,22 @@ class App
     next()
 
   ###
-  # aws lambda handler
+  # AWS Lambda Function Handler
+  # http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
   #
+  # @param {Object} request, Alexa request data
+  # @param {Object} context, runtime information of the Lambda function that is executing.
+  # @param {cb} callback, return information to the caller. 
+  # @public
   ###
-  handler : ( event, context, cb ) =>
-    throw new Error( "Old format not supported. Use with node 4.4" ) unless arguments.length is 3
+  lambda : ( request, context, cb ) =>
+    cb = nodeifyContext context if arguments.length < 3 # pre node 4.3 runtime
 
-    req = Request.create type : event.request.type, original : event, app : @
+    req = Request.create type : request.request.type, original : request, app : @
 
     out = ( err ) ->
       return cb err if err?
-      cb null, res.data
+      cb null, res.toObject()
 
     res = new Response app : @, out : out
     @handle req, res, out

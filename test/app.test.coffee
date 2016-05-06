@@ -22,13 +22,13 @@ describe "alexpress", ->
   describe "defaults", ->
 
     it "default output without middleware", ( done ) ->
-      app.handler request( "horoscope" ), {}, ( err, res ) ->
+      app.lambda request( "horoscope" ), {}, ( err, res ) ->
         return done err if err?
         res.version.should.equal "1.0"
         done()
 
     it "close the session", ( done ) ->
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
         res.response.shouldEndSession.should.equal true
         done()
@@ -38,23 +38,23 @@ describe "alexpress", ->
     it "default speech format is PlainText", ( done ) ->
       app.use "/launch", ( req, res, next ) -> res.send "test"
 
-      app.handler request( "launch" ), null, ( err, res ) ->
+      app.lambda request( "launch" ), null, ( err, res ) ->
         return done err if err?
         res.response.outputSpeech.type.should.equal "PlainText"
         res.response.outputSpeech.text.should.equal "test"
         done()
 
     it "set speech output format to SSML", ( done ) ->
-      str = "Let's get started"
+      str = "<speak>Let's get started</speak>"
       app.set "format", "SSML"
 
       app.use "/launch", ( req, res, next ) -> res.send str
 
-      app.handler request( "launch" ), null, ( err, res ) ->
+      app.lambda request( "launch" ), null, ( err, res ) ->
         return done err if err?
 
         res.response.outputSpeech.type.should.equal "SSML"
-        res.response.outputSpeech.ssml.should.equal "<speak>#{str}</speak>"
+        res.response.outputSpeech.ssml.should.equal str
         done()
 
     it "reprompt", ( done ) ->
@@ -64,7 +64,7 @@ describe "alexpress", ->
         .reprompt "b"
         .ask "a"
 
-      app.handler request( "help" ), null, ( err, res ) ->
+      app.lambda request( "help" ), null, ( err, res ) ->
         return done err if err?
         res.response.reprompt.outputSpeech.text.should.equal "b"
         res.response.outputSpeech.text.should.equal "a"
@@ -75,7 +75,7 @@ describe "alexpress", ->
       app.use "/intent/amazon/help", ( req, res, next ) ->
         res.ask [ "a", "b" ]
 
-      app.handler request( "help" ), null, ( err, res ) ->
+      app.lambda request( "help" ), null, ( err, res ) ->
         return done err if err?
 
         res.response.reprompt.outputSpeech.text.should.equal "b"
@@ -85,7 +85,7 @@ describe "alexpress", ->
     it "`tell` closes the session", ( done ) ->
       app.use ( req, res, next ) -> res.tell "bye"
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
         res.response.shouldEndSession.should.equal true
         done()
@@ -93,7 +93,7 @@ describe "alexpress", ->
     it "`ask` keeps the session alive", ( done ) ->
       app.use ( req, res, next ) -> res.ask "wassup?"
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
         res.response.shouldEndSession.should.equal false
         done()
@@ -114,7 +114,7 @@ describe "alexpress", ->
 
         res.send str
 
-      app.handler request( "launch" ), null, ( err, res ) ->
+      app.lambda request( "launch" ), null, ( err, res ) ->
         return done err if err?
         res.response.outputSpeech.type.should.equal "PlainText"
         res.response.outputSpeech.text.should.equal str
@@ -131,7 +131,7 @@ describe "alexpress", ->
         .keepAlive true
         .send horoscopes[ sign ]
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
         res.sessionAttributes.supportedHoroscopePeriods.daily.should.equal true
         res.response.outputSpeech.text.should.equal horoscopes.virgo
@@ -143,7 +143,7 @@ describe "alexpress", ->
         req.reason.should.equal "USER_INITIATED"
         res.send "done"
 
-      app.handler request( "sessionEnded" ), null, ( err, res ) ->
+      app.lambda request( "sessionEnded" ), null, ( err, res ) ->
         return done err if err?
         done()
 
@@ -151,7 +151,7 @@ describe "alexpress", ->
       app.use "/intent/amazon/help", ( req, res, next ) ->
         res.ask "wassup?"
 
-      app.handler request( "help" ), null, ( err, res ) ->
+      app.lambda request( "help" ), null, ( err, res ) ->
         return done err if err?
         res.response.outputSpeech.text.should.equal "wassup?"
         done()
@@ -178,7 +178,7 @@ describe "alexpress", ->
       app.use ( req, res, next ) ->
         res.tell req.output.join " "
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         return done err if err?
         res.response.outputSpeech.text.should.equal "1 2 3"
         done()
@@ -189,7 +189,7 @@ describe "alexpress", ->
 #      app.use "/launch", ( req, res, next ) ->
 #        res.ask "wassup?"
 #
-#      app.handler request( "launch" ), null, ( err, res ) ->
+#      app.lambda request( "launch" ), null, ( err, res ) ->
 #        return done err if err?
 #        res.sessionAttributes.test.should.equal 123
 #        done()
@@ -199,7 +199,7 @@ describe "alexpress", ->
       app.use ( req, res, next ) ->
         throw new Error( "test" )
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
         err.message.should.equal "test"
         done()
 
@@ -211,7 +211,7 @@ describe "alexpress", ->
         err.message.should.equal "test"
         done()
 
-      app.handler request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), null, ( err, res ) ->
 
   describe "session", ->
 
@@ -220,7 +220,7 @@ describe "alexpress", ->
         res.keepAlive true
         .ask "wassup?"
 
-      app.handler request( "help" ), null, ( err, res ) ->
+      app.lambda request( "help" ), null, ( err, res ) ->
         return done err if err?
         res.response.shouldEndSession.should.equal false
         done()
@@ -230,7 +230,7 @@ describe "alexpress", ->
         res.session "abraca", "dabra"
         .ask "wassup?"
 
-      app.handler request( "help" ), null, ( err, res ) ->
+      app.lambda request( "help" ), null, ( err, res ) ->
         return done err if err?
         res.sessionAttributes.abraca.should.equal "dabra"
         done()
@@ -245,7 +245,7 @@ describe "alexpress", ->
 #        req.context.name "test"
 #        res.ask "wassup?"
 #
-#      app.handler request( "help" ), null, ( err, res ) ->
+#      app.lambda request( "help" ), null, ( err, res ) ->
 #        return done err if err?
 #        res.sessionAttributes.name.should.equal "test"
 #        done()

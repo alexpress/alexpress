@@ -9,7 +9,8 @@
   "description": "express-js like api for custom amazon alexa skills",
   "dependencies": {
     "bluebird": "^3.3.5",
-    "dot": "^1.0.3"
+    "dot": "^1.0.3",
+    "merge": "^1.2.0"
   },
   "bundleDependencies": [],
   "main": "dist/index",

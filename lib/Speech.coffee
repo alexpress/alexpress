@@ -1,5 +1,5 @@
 dot = require 'dot'
-merge = require './util/merge'
+merge = require 'merge'
 path = require 'path'
 dfs = require './util/dfs'
 exists = require './util/exists'
@@ -12,7 +12,7 @@ formats =
   ".txt" : "PlainText"
   ".ssml" : "SSML"
 
-module.exports = class Speech
+class Speech
 
   constructor : ( {@name, @app} ) ->
     @ready = @load()
@@ -41,7 +41,9 @@ module.exports = class Speech
     @ready.then =>
       data = merge {}, @app.locals
       data = merge data, locals
-      @template data
+      data : @template( data ), format : @format
 
+speech = ( opts ) -> new Speech opts
+speech.Speech = Speech
 
-      
+module.exports = speech

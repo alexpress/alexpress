@@ -14,9 +14,9 @@ describe "Speech", ->
   it "load a template", ( done ) ->
     s = new Speech name : "gettysburg", app : app
     s.render when : "Four score and seven years", what : "Liberty"
-    .then (txt) ->
-      s.format.should.equal 'PlainText'
-      txt.should.equal gettysburg
+    .then ( x ) ->
+      x.format.should.equal 'PlainText'
+      x.data.should.equal gettysburg
       done()
 
 

@@ -1,6 +1,9 @@
 # alexpress
 `express-js` line API for Amazon alexa custom skills.
 
+> The [Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit) enables you to give Alexa new abilities by building a cloud-based service. This service can be either a web service or an AWS [Lambda](http://aws.amazon.com/lambda/) function. 
+>
+
 ## Installation
 Install with npm
 
@@ -39,7 +42,7 @@ app.use "/intent/startGame", ( req, res, next ) ->
 
 ## API
 
-#### alexpress()
+##### **alexpress**()
 
 Creates an alexpress application. 
 
@@ -52,13 +55,13 @@ app = alexpress()
 
 Created by calling `alexpress()`.
 
-#### **Methods**
+#### Methods
 
 ##### **app.get**
 
-Returns the value of **name** app setting. For example:
+Returns the value of **name**  [app settings](#application-settings). For example:
 
-```coff
+```coffeescript
 app.get 'foo'
 # => undefined
 
@@ -67,13 +70,25 @@ app.get 'foo'
 # => 'bar'
 ```
 
-##### **app.handler**
+##### **app.lambda(request, context, callback)**
+
+Entry point invoked by AWS Lambda.
+
+* **request**  `{Object}` contains Alexa request information as a JSON object. 
+* **context** `{Object|null}` AWS Lambda uses this parameter to provide your handler the runtime information of the Lambda function that is executing.
+* **callback** `Function(Error error,  Object response)` Invoked by AWS Lambda to return information to the caller.
+
+`app.lambda` must be exported to AWS.
+
+```coffeescript
+ exports.handler = app.lambda
+```
 
 ##### **app.set(name, value)**
 
-Sets setting **name** to **value**. See [app settings](#appsettings).
+Sets setting **name** to **value**. See [app settings](#application-settings).
 
-##### **Application Settings**
+##### Application Settings
 
 | Property |  Type  | Description                              | Default                     |
 | -------- | :----: | ---------------------------------------- | --------------------------- |
@@ -179,7 +194,7 @@ Describes why the session ended. Available only for `SessionEndedRequest`. Possi
 
 ##### request.session(name)
 
-Returns the value of the session attribute with the key **name**.
+Returns the value of the session attribute with the key **name**. If **name** is not supplied, returns the full map of session attributes.
 
 > The attributes map is empty for requests where a new session has started with the attribute new set to true.
 
@@ -189,27 +204,75 @@ Returns the value of **name** from request's slots.
 
 > Slots are map of key-value pairs that further describes what the user meant based on a predefined intent schema. Populated only for `IntentRequest` type.
 
-### response
+### Response
 
-response.version
+#### Properties
 
-response.keepAlive
+##### **response.version** `{String}`
 
-response.session
+The version specifier for the response with the value to be defined as: “1.0”
 
-response.ssml
+#### Methods
 
-response.text
+##### response.keepAlive([alive])
 
-response.reprompt
+Gets or sets a flag telling the system whether the session to stay active or end. 
 
-response.ask
+> This is the inverse of `shouldEndSession` in Alexa's response object.
 
-response.tell
+##### response.session([name, [value]])
 
-response.send
+Gets or sets the value of **name** in the response's session attribute map. Session attributes are persisted across the session (i.e returned in the next request, unless the session ends).
 
-response.render
+##### response.ssml(speech[, prompt])
+
+Sets the `outputSpeech` (and optionally, `reprompt` via **prompt** ) property of the response. **speech** and  **prompt** are strings containing text [marked up with SSML](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speech-synthesis-markup-language-ssml-reference) to render to the user.  The format of the output (and reprompt) is set to `SSML`.
+
+##### response.plainText(speech[, prompt])
+
+Sets the `outputSpeech` (and optionally, `reprompt` via **prompt** ) property of the response. **speech** and  **prompt** are strings containing text to render to the user.  The format of the output (and reprompt) is set to `PlainText`.
+
+##### response.reprompt(prompt)
+
+Sets the `reprompt` property of the response to **prompt**. The format of the **prompt** string must match the `reprompt` format which is set [separately](#outputformat).
+
+##### response.ask(speech[, prompt])
+
+Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. The session is set to stay alive.
+
+##### response.tell(speech[, prompt])
+
+Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. The session is set to end. The format
+
+##### response.send(speech[, prompt])
+
+Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely prior to calling send(). 
+
+##### response.render(speech[, prompt])
+
+Renders template **speech** and sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely.
+
+##### response.simpleCard(title,[text])
+
+##### response.standardCard()
+
+##### response.LinkAccountCard()
+
+##### response.format([format]) <a name='outputformat'></a>
+
+Gets or sets the format for `outputSpeech`. 
+
+> The default format can be set via **app.set('format', format)** [application setting](#application-settings).
+
+##### response.repromptFormat()
+
+Gets or sets the format for `reprompt`. 
+
+> The default format can be set via **app.set('format', format)** [application setting](#application-settings).
+
+##### 
+
+
 
 
 
