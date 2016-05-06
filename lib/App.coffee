@@ -6,7 +6,7 @@ defer = setImmediate or ( fn ) -> process.nextTick fn.bind.apply( fn, arguments 
 
 class App
 
-  constructor : (  ) ->
+  constructor : () ->
     @route = "/"
     @stack = []
     @settings =
@@ -24,7 +24,9 @@ class App
   # Sets the value of name app setting, where name is one of
   # strings in the app settings table.
   ###
-  set : ( name, value ) => @settings[ name ] = value
+  set : ( name, value ) =>
+    @settings[ name ] = value
+    @
 
   ###
   # Utilize the given middleware `handle` to the given `route`,

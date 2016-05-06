@@ -56,13 +56,26 @@ module.exports = class Response extends EventEmitter
       @ros undefined
     @
 
-  card : =>
-    @_card
+  card : => @_card
 
-  simpleCard : ( title, text ) =>
+  simpleCard : ( title, content ) =>
     @_card = Card.create type : "Simple"
     .title title
+    .content content
+    @
+
+  standardCard : ( title, text, smallImageUrl, largeImageUrl ) =>
+    @_card = Card.create type : "Standard"
+    .title title
     .text text
+    .smallImageUrl smallImageUrl
+    .largeImageUrl largeImageUrl
+    @
+
+  linkAccountCard : () =>
+    @_card = Card.create type : "LinkAccount"
+    @keepAlive false # user must use app for account linking
+    @
 
   speech : ( str ) => @_speech @os(), str
 
@@ -73,7 +86,7 @@ module.exports = class Response extends EventEmitter
   tell : ( speech, prompt ) => @keepAlive( false ).send speech, prompt
 
   ssml : ( speech, prompt ) => @format( "SSML" ).send speech, prompt
-    
+
   plainText : ( speech, prompt ) => @format( "PlainText" ).send speech, prompt
 
   send : ( speech, prompt ) =>

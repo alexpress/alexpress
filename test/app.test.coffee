@@ -5,44 +5,58 @@ path = require 'path'
 horoscopes = require './fixtures/horoscopes'
 
 request = ( name ) -> require path.join __dirname, "fixtures", "request", "#{name}.json"
-
-#class Ctx extends SessionContext
-#  init : =>
-#    @fields =
-#      name : undefined
-#    super()
-
 app = undefined
+context = {}
+
+should.use require './ext/ext'
+
+sessionStaysActive = ( res ) -> res.response.shouldEndSession.should.equal false
+sessionEnds = ( res ) -> res.response.shouldEndSession.should.equal true
+formatIs = ( res, format ) -> res.response.outputSpeech.type.should.equal format
+
+run = ( name, done, fn ) ->
+  app.lambda request( name ), context, ( err, res ) ->
+    return done err if err?
+    fn res
+    done()
 
 describe "alexpress", ->
 
-  beforeEach ->
-    app = alexpress()
+  beforeEach -> app = alexpress()
 
   describe "defaults", ->
-
-    it "default output without middleware", ( done ) ->
-      app.lambda request( "horoscope" ), {}, ( err, res ) ->
-        return done err if err?
+    it "don't keep session active", ( done ) ->
+      run "horoscope", done, ( res ) ->
         res.version.should.equal "1.0"
-        done()
+        res.should.endSession()
+        sessionEnds res
 
-    it "close the session", ( done ) ->
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.shouldEndSession.should.equal true
-        done()
+  describe "app", ->
 
-  describe "output", ->
+    it "get/set", ->
+      should.not.exist app.get 'test'
+
+    it "get/set", ->
+      assert app.get( 'format' ), 'PlainText'
+
+    it "get/set", ->
+      app.set 'format', 'SSML'
+      assert app.get( 'format' ), 'SSML'
+
+    it "keep alive", ( done ) ->
+      app.set 'keep alive', true
+
+      run "horoscope", done, ( res ) ->
+        res.should.not.endSession()
+
+  describe "speech output", ->
 
     it "default speech format is PlainText", ( done ) ->
       app.use "/launch", ( req, res, next ) -> res.send "test"
 
-      app.lambda request( "launch" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.outputSpeech.type.should.equal "PlainText"
-        res.response.outputSpeech.text.should.equal "test"
-        done()
+      run "launch", done, ( res ) ->
+        res.should.have.outputSpeechFormat 'PlainText'
+        .and.outputSpeech 'test'
 
     it "set speech output format to SSML", ( done ) ->
       str = "<speak>Let's get started</speak>"
@@ -50,59 +64,45 @@ describe "alexpress", ->
 
       app.use "/launch", ( req, res, next ) -> res.send str
 
-      app.lambda request( "launch" ), null, ( err, res ) ->
-        return done err if err?
-
-        res.response.outputSpeech.type.should.equal "SSML"
-        res.response.outputSpeech.ssml.should.equal str
-        done()
+      run "launch", done, ( res ) ->
+        res.should.have.outputSpeechFormat 'SSML'
+        .and.outputSpeech str
 
     it "reprompt", ( done ) ->
       app.set "json spaces", 2
       app.use "/intent/amazon/help", ( req, res, next ) ->
-        res
-        .reprompt "b"
-        .ask "a"
+        res.ask "a", "b"
 
-      app.lambda request( "help" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.reprompt.outputSpeech.text.should.equal "b"
-        res.response.outputSpeech.text.should.equal "a"
-        done()
+      run "help", done, ( res ) ->
+        res.should.have.repromptSpeech "b"
+        .and.outputSpeech "a"
 
     it "reprompt inline", ( done ) ->
       app.set "json spaces", 2
       app.use "/intent/amazon/help", ( req, res, next ) ->
         res.ask [ "a", "b" ]
 
-      app.lambda request( "help" ), null, ( err, res ) ->
-        return done err if err?
-
-        res.response.reprompt.outputSpeech.text.should.equal "b"
-        res.response.outputSpeech.text.should.equal "a"
-        done()
+      run "help", done, ( res ) ->
+        res.should.have.repromptSpeech "b"
+        .and.outputSpeech "a"
 
     it "`tell` closes the session", ( done ) ->
       app.use ( req, res, next ) -> res.tell "bye"
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.shouldEndSession.should.equal true
-        done()
+      run "horoscope", done, ( res ) ->
+        res.should.endSession()
 
     it "`ask` keeps the session alive", ( done ) ->
       app.use ( req, res, next ) -> res.ask "wassup?"
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.shouldEndSession.should.equal false
-        done()
+      run "horoscope", done, ( res ) ->
+        res.should.not.endSession()
 
   describe "middleware", ->
     it "for LaunchRequest", ( done ) ->
       str = "Let's get started"
       app.use "/launch", ( req, res, next ) ->
-        req.new.should.equal true
+        req.should.be.newSession()
         req.type.should.equal "LaunchRequest"
         req.timestamp.should.equal "2015-05-13T12:34:56Z"
         req.requestId.should.equal "amzn1.echo-api.request.0000000-0000-0000-0000-00000000000"
@@ -114,11 +114,9 @@ describe "alexpress", ->
 
         res.send str
 
-      app.lambda request( "launch" ), null, ( err, res ) ->
-        return done err if err?
-        res.response.outputSpeech.type.should.equal "PlainText"
-        res.response.outputSpeech.text.should.equal str
-        done()
+      run "launch", done, ( res ) ->
+        res.should.have.outputSpeechFormat 'PlainText'
+        .and.outputSpeech str
 
     it "for intents", ( done ) ->
       app.use "/intent/GetZodiacHoroscope", ( req, res, next ) ->
@@ -131,30 +129,24 @@ describe "alexpress", ->
         .keepAlive true
         .send horoscopes[ sign ]
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        return done err if err?
+      run "horoscope", done, ( res ) ->
         res.sessionAttributes.supportedHoroscopePeriods.daily.should.equal true
         res.response.outputSpeech.text.should.equal horoscopes.virgo
         res.response.shouldEndSession.should.equal false
-        done()
 
     it "for session ended", ( done ) ->
       app.use "/sessionEnded", ( req, res, next ) ->
         req.reason.should.equal "USER_INITIATED"
         res.send "done"
 
-      app.lambda request( "sessionEnded" ), null, ( err, res ) ->
-        return done err if err?
-        done()
+      run "sessionEnded", done, ( res ) ->
 
     it "for built-in intents", ( done ) ->
       app.use "/intent/amazon/help", ( req, res, next ) ->
         res.ask "wassup?"
 
-      app.lambda request( "help" ), null, ( err, res ) ->
-        return done err if err?
+      run "help", done, ( res ) ->
         res.response.outputSpeech.text.should.equal "wassup?"
-        done()
 
     it "multiple middleware for a route", ( done ) ->
       h1 = ( req, res, next ) ->
@@ -178,29 +170,16 @@ describe "alexpress", ->
       app.use ( req, res, next ) ->
         res.tell req.output.join " "
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        return done err if err?
+      run "horoscope", done, ( res ) ->
         res.response.outputSpeech.text.should.equal "1 2 3"
-        done()
-
-#    it "persist session attributes", ( done ) ->
-#      app.use persistSession
-#
-#      app.use "/launch", ( req, res, next ) ->
-#        res.ask "wassup?"
-#
-#      app.lambda request( "launch" ), null, ( err, res ) ->
-#        return done err if err?
-#        res.sessionAttributes.test.should.equal 123
-#        done()
 
   describe "handle errors", ->
     it "in the callback", ( done ) ->
       app.use ( req, res, next ) ->
         throw new Error( "test" )
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
-        err.message.should.equal "test"
+      app.lambda request( "horoscope" ), context, ( err, res ) ->
+        should( err instanceof Error ).equal true
         done()
 
     it "in middleware", ( done ) ->
@@ -211,7 +190,9 @@ describe "alexpress", ->
         err.message.should.equal "test"
         done()
 
-      app.lambda request( "horoscope" ), null, ( err, res ) ->
+      app.lambda request( "horoscope" ), context, ( err, res ) ->
+        should( err instanceof Error ).equal true
+        done()
 
   describe "session", ->
 
@@ -220,36 +201,16 @@ describe "alexpress", ->
         res.keepAlive true
         .ask "wassup?"
 
-      app.lambda request( "help" ), null, ( err, res ) ->
-        return done err if err?
+      run "help", done, ( res ) ->
         res.response.shouldEndSession.should.equal false
-        done()
 
     it "set session attributes", ( done ) ->
       app.use "/intent/amazon/help", ( req, res, next ) ->
         res.session "abraca", "dabra"
         .ask "wassup?"
 
-      app.lambda request( "help" ), null, ( err, res ) ->
-        return done err if err?
+      run "help", done, ( res ) ->
         res.sessionAttributes.abraca.should.equal "dabra"
-        done()
-
-  describe "context", ->
-#    it "attach session context object", ( done ) ->
-#      app.use ( req, res, next ) ->
-#        new Ctx req, res
-#        next()
-#
-#      app.use "/intent/amazon/help", ( req, res, next ) ->
-#        req.context.name "test"
-#        res.ask "wassup?"
-#
-#      app.lambda request( "help" ), null, ( err, res ) ->
-#        return done err if err?
-#        res.sessionAttributes.name.should.equal "test"
-#        done()
-
 
 
 
