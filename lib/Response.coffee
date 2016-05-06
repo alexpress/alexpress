@@ -123,6 +123,8 @@ module.exports = class Response extends EventEmitter
     merge @data.response, outputSpeech : @os().toObject()
     if @_ros?
       merge @data.response, { reprompt : { outputSpeech : @ros().toObject() } }
+    if @_card?
+      merge @data.response, card : @_card.toObject()
     @data
 
   os : ( val ) =>

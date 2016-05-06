@@ -212,5 +212,40 @@ describe "alexpress", ->
       run "help", done, ( res ) ->
         res.sessionAttributes.abraca.should.equal "dabra"
 
+  describe "cards", ->
+
+    it "simple card", ( done ) ->
+      app.use ( req, res, next ) ->
+        res.simpleCard "my title", "my content"
+        .send()
+
+      run "horoscope", done, ( res ) ->
+        res.response.card.type.should.equal 'Simple'
+        res.response.card.title.should.equal 'my title'
+        res.response.card.content.should.equal 'my content'
+        should.not.exist res.response.card.text
+
+    it "standard card", ( done ) ->
+      app.use ( req, res, next ) ->
+        res.standardCard "my title", "my text", "smallurl", "bigurl"
+        .send()
+
+      run "horoscope", done, ( res ) ->
+        res.response.card.type.should.equal 'Standard'
+        res.response.card.title.should.equal 'my title'
+        res.response.card.text.should.equal 'my text'
+        res.response.card.image.smallImageUrl.should.equal 'smallurl'
+        res.response.card.image.largeImageUrl.should.equal 'bigurl'
+        should.not.exist res.response.card.content
+
+    it "link account card", ( done ) ->
+      app.use ( req, res, next ) ->
+        res.linkAccountCard().send()
+
+      run "horoscope", done, ( res ) ->
+        should.not.exist res.response.card.title
+        should.not.exist res.response.card.content
+        should.not.exist res.response.card.text
+        res.should.endSession()
 
 

@@ -12,18 +12,20 @@ npm install alexa-express
 ```
 
 ## Examples
-### Create app
+##### Hello World
 ```coffeescript
-app = new require("alexa-express")()
-```
+app = require('alexpress')()
 
-### Handle `LaunchRequest`
-```coffeescript
+# respond to 'LaunchRequest'
 app.use "/launch", ( req, res, next ) ->
-  res.tell "Welcome!"
+  # render in plain text and close session
+  res.tell "Hello world"
+ 
+# AWS lambda hookup
+exports.handler = app.lambda
 ```
 
-### Built-in Intents
+##### Built-in Intents
 
 ```coffeescript
 # AMAZON.HelpIntent
@@ -32,12 +34,20 @@ app.use "/intent/amazon/help", ( req, res, next ) ->
 ```
 
 
-### Custom Intents
+##### Custom Intents
 
 ```coffeescript
 # StartGameIntent
 app.use "/intent/startGame", ( req, res, next ) ->
   res.ask "What do you want to play?"
+```
+
+#### Cards
+
+```coffeescript
+app.use (req, res, next) ->
+  res.simpleCard "some title", "some content"
+  .send()
 ```
 
 ## API
@@ -90,10 +100,11 @@ Sets setting **name** to **value**. See [app settings](#application-settings).
 
 ##### Application Settings
 
-| Property |  Type  | Description                              | Default                     |
-| -------- | :----: | ---------------------------------------- | --------------------------- |
-| `speech` | String | Directory for the application's speech templates. | `process.cwd() + '/speech'` |
-| `format` | String | Default format to use for  `outputSpeech`  and `reprompt`. Acceptable values are: `SSML`, `PlainText`. | `PlainText`                 |
+| Property     |  Type   | Description                              | Default                     |
+| ------------ | :-----: | ---------------------------------------- | --------------------------- |
+| `speech`     | String  | Directory for the application's speech templates. | `process.cwd() + '/speech'` |
+| `format`     | String  | Default format to use for  `outputSpeech`  and `reprompt`. Acceptable values are: `SSML`, `PlainText`. | `PlainText`                 |
+| `keep alive` | Boolean | Default value value for whether session should stay alive or end. | `false`                     |
 
 ##### **app.use(path, function [, function...])**
 
@@ -194,9 +205,13 @@ Describes why the session ended. Available only for `SessionEndedRequest`. Possi
 
 ##### request.session(name)
 
-Returns the value of the session attribute with the key **name**. If **name** is not supplied, returns the full map of session attributes.
+Returns the value of the session attribute with the key **name**. If **name** is not supplied, returns the full map of session attributes. The attributes map is empty for requests where a new session has started with the attribute new set to true. 
 
-> The attributes map is empty for requests where a new session has started with the attribute new set to true.
+```coffeescript
+app.use "/intent/getZodiacHoroscope", (req, res, next) ->
+  console.log req.session "supportedHoroscopePeriods"	
+  # => { "daily": true, "weekly": false, "monthly": false }
+```
 
 ##### request.slot(name)
 
@@ -204,13 +219,19 @@ Returns the value of **name** from request's slots.
 
 > Slots are map of key-value pairs that further describes what the user meant based on a predefined intent schema. Populated only for `IntentRequest` type.
 
+```coffeescript
+app.use "/intent/getZodiacHoroscope", (req, res, next) ->
+  console.log req.slot "ZodiacSign"	
+  # => 'virgo'
+```
+
 ### Response
 
 #### Properties
 
 ##### **response.version** `{String}`
 
-The version specifier for the response with the value to be defined as: “1.0”
+The version specifier for the response with the value to be defined as: `“1.0”`
 
 #### Methods
 
@@ -220,39 +241,114 @@ Gets or sets a flag telling the system whether the session to stay active or end
 
 > This is the inverse of `shouldEndSession` in Alexa's response object.
 
+```coffeescript
+# we need more information from the user so keep the session alive
+app.use "/launch", (req, res, next) ->
+	res.keepAlive(true).send("What's your zodiac sign?")
+```
 ##### response.session([name, [value]])
 
-Gets or sets the value of **name** in the response's session attribute map. Session attributes are persisted across the session (i.e returned in the next request, unless the session ends).
+Gets or sets the value of **name** in the response's session attribute map. 
+```coffeescript
+# Record the user's answer so that we have it when they respond
+app.use "/intent/zodiacSign", (req, res, next) ->
+	zodiacSign = req.slot 'ZodiacSign'
+    res.session 'ZodiacSign', zodiacSign
+	res.ask "Do you want your weekly or monthly horoscope?"
+    
+app.use "/intent/period", (req, res, next) ->
+	zodiacSign = req.slot 'ZodiacSign'
+	period = req.slot 'Period'
+    horoscope = getHoroscope zodaicSign, period
+	res.tell "Here's the #{period} horoscope for #{zodiacSign}: #{horoscope}"
+```
 
 ##### response.ssml(speech[, prompt])
 
 Sets the `outputSpeech` (and optionally, `reprompt` via **prompt** ) property of the response. **speech** and  **prompt** are strings containing text [marked up with SSML](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speech-synthesis-markup-language-ssml-reference) to render to the user.  The format of the output (and reprompt) is set to `SSML`.
+```coffeescript
+# we need more information from the user so keep the session alive
+app.use "/launch", (req, res, next) ->
+	res.keepAlive(true).ssml("<speech>What's your zodiac sign</speech>")
+```
 
 ##### response.plainText(speech[, prompt])
 
 Sets the `outputSpeech` (and optionally, `reprompt` via **prompt** ) property of the response. **speech** and  **prompt** are strings containing text to render to the user.  The format of the output (and reprompt) is set to `PlainText`.
+```coffeescript
+app.set "format", "SSML"	# SSML format by default
+
+# send this speech in plain text format
+app.use "/launch", (req, res, next) ->
+	res.keepAlive(true).plainText("<speech>What's your zodiac sign</speech>")
+```
 
 ##### response.reprompt(prompt)
 
 Sets the `reprompt` property of the response to **prompt**. The format of the **prompt** string must match the `reprompt` format which is set [separately](#outputformat).
 
+```coffeescript
+app.use "/launch", (req, res, next) ->
+	res
+    .keepAlive(true)
+    .reprompt "I didn't get that. What's your zodiac sign?"
+    .send "What's your zodiac sign?"
+```
+
 ##### response.ask(speech[, prompt])
 
 Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. The session is set to stay alive.
 
+```coffeescript
+# keeps session alive 
+app.use "/launch", (req, res, next) ->
+	res.ask "I didn't get that. What's your zodiac sign?"
+```
 ##### response.tell(speech[, prompt])
 
-Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. The session is set to end. The format
+Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. The session is set to end. 
 
+```coffeescript
+# close the session
+app.use "/intent/getHoroscope", (req, res, next) ->
+  	horoscope = getHoroscope req.slot "ZodiacSign"
+	res.tell "Here's your horoscope: #{horoscope}"
+```
 ##### response.send(speech[, prompt])
 
 Sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely prior to calling send(). 
 
-##### response.render(speech[, prompt])
+```coffeescript
+# send output speech and reprompt
+app.use "/launch", (req, res, next) ->
+	res
+    .keepAlive(true)
+    .send "What's your zodiac sign?", "I didn't get that. What's your zodiac sign?"
+```
+##### response.render(speech [,prompt] \[, locals])
 
-Renders template **speech** and sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely.
+Renders template **speech** and sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely. Template files must be located in the directory specified by the  `speech` application setting.
 
-##### response.simpleCard(title,[text])
+```coffeescript
+# render speech from template 'horoscope'
+app.use "/intent/getHoroscope", (req, res, next) ->
+	horoscope = getHoroscope req.slot "ZodiacSign"
+    res.locals.horoscope = horoscope
+	res.render "horoscope"
+```
+Here's the speech template for the above example (uses the [doT](http://olado.github.io/doT/) template engine).
+
+```
+Here's your horoscope: {{=it.horoscope}}
+```
+
+Template context data is merged in the following order (last wins):
+
+* **response.sessionAttributes**
+* **response.locals**
+* `locals` option to **response.render**
+
+##### response.simpleCard(title, [text])
 
 ##### response.standardCard()
 
@@ -271,6 +367,47 @@ Gets or sets the format for `reprompt`.
 > The default format can be set via **app.set('format', format)** [application setting](#application-settings).
 
 ##### 
+
+## Reference
+
+### Sample Request JSON - Horoscope<a name="horoscope"></a>
+
+```json
+{
+  "version": "1.0",
+  "session": {
+    "new": false,
+    "sessionId": "amzn1.echo-api.session.0000000-0000-0000-0000-00000000000",
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe"
+    },
+    "attributes": {
+      "supportedHoroscopePeriods": {
+        "daily": true,
+        "weekly": false,
+        "monthly": false
+      }
+    },
+    "user": {
+      "userId": "amzn1.account.AM3B00000000000000000000000"
+    }
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": " amzn1.echo-api.request.0000000-0000-0000-0000-00000000000",
+    "timestamp": "2015-05-13T12:34:56Z",
+    "intent": {
+      "name": "GetZodiacHoroscopeIntent",
+      "slots": {
+        "ZodiacSign": {
+          "name": "ZodiacSign",
+          "value": "virgo"
+        }
+      }
+    }
+  }
+}
+```
 
 
 
