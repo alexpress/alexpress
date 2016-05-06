@@ -1,8 +1,11 @@
 # alexpress
-`express-js` line API for Amazon alexa custom skills.
+`alexpress` is an `express` like API for Amazon alexa custom skills. 
 
-> The [Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit) enables you to give Alexa new abilities by building a cloud-based service. This service can be either a web service or an AWS [Lambda](http://aws.amazon.com/lambda/) function. 
->
+> The [Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit) enables you to give Alexa new abilities by building a cloud-based service. This service can be either a web service or an AWS [Lambda](http://aws.amazon.com/lambda/) function.
+
+Unlike `express`, `alexpress` does not interface with http servers or html. Instead, `alexpress` uses with javascript objects as its input and output. You can use `alexpress` as with AWS lambda (via **application.lambda()**) or with a custom server (via **application.run()**).
+
+`alexpress` borrows its middleware functionality from `connect`.
 
 ## Installation
 Install with npm
@@ -18,7 +21,7 @@ app = require('alexpress')()
 
 # respond to 'LaunchRequest'
 app.use "/launch", ( req, res, next ) ->
-  # render in plain text and close session
+  # render output speech in plain text format and close the session
   res.tell "Hello world"
  
 # AWS lambda hookup
@@ -49,6 +52,19 @@ app.use (req, res, next) ->
   res.simpleCard "some title", "some content"
   .send()
 ```
+
+## About URLs
+
+`application.use()` mounts middleware on an (optional) url .  `alexpress` generates urls from the underlying Alexa requests  (avaible as `request.url` ) thus:
+
+| Request Type                         | Url                     |                                          |
+| ------------------------------------ | ----------------------- | ---------------------------------------- |
+| `LaunchRequest`                      | `/launch`               |                                          |
+| `SessionEndedRequest`                | `/sessionEnded`         |                                          |
+| `IntentRequest` for built-in intents | `/intent/amazon/{name}` | `AMAZON.{Name}Intent`                    |
+| `IntentRequest` for custom intents   | `/intent/{name}`        | `{Name}Intent`. Note that a trailing `Intent` in the intent's name is stripped out. |
+
+Note that urls are *not* case sensitive.
 
 ## API
 
@@ -93,6 +109,13 @@ Entry point invoked by AWS Lambda.
 ```coffeescript
  exports.handler = app.lambda
 ```
+
+##### app.run(request, callback)
+
+Runs the application. 
+
+- request**  is an `{Object}` containing the Alexa request.
+- **callback** `a Function(Error error,  Object response)` used to return information to the caller.
 
 ##### **app.set(name, value)**
 

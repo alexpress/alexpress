@@ -1,9 +1,9 @@
-OutputSpeech = require './outputSpeech'
-Card = require './card'
-speech = require './Speech'
+OutputSpeech = require './../outputSpeech/index'
+Card = require './../card/index'
+speech = require './../Speech'
 merge = require 'merge'
 EventEmitter = require( 'events' ).EventEmitter
-makeProps = require './util/makeProps'
+makeProps = require './../util/makeProps'
 
 module.exports = class Response extends EventEmitter
 
@@ -117,7 +117,7 @@ module.exports = class Response extends EventEmitter
       @send x.speech.data, x.prompt.data
 
   end : =>
-    @out()
+    @out null, @toObject()
 
   toObject : =>
     merge @data.response, outputSpeech : @os().toObject()

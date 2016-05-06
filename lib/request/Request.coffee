@@ -1,6 +1,7 @@
 TypedClass = require '../util/TypedClass'
 
 module.exports = class Request extends TypedClass
+  
   constructor : ( {@type, @original} )->
     @requestId = @original.request.requestId
     @timestamp = @original.request.timestamp

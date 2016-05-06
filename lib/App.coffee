@@ -1,22 +1,41 @@
-Request = require './request'
-Response = require './Response'
+request = require './request'
+response = require './response'
 nodeifyContext = require './util/nodeify-lambda-context'
+merge = require 'merge'
 
 defer = setImmediate or ( fn ) -> process.nextTick fn.bind.apply( fn, arguments )
 
+###*
+* @class App
+###
 class App
 
-  constructor : () ->
+  ###*
+  * Constructor: creates an alexpress application
+  *
+  *
+  * @param {Object} `opts` (optional) config information (default: {})
+  *
+  *   * `settings`    {Object} with app settings (default: {})
+  *   * `request`     The {Function} to call to create a request object (default `request`)
+  *   * `response`    The {Function} to call to create a response object (default `response`)
+  * @api public
+  ###
+  constructor : ( opts = {} ) ->
     @route = "/"
     @stack = []
     @settings =
       "speech" : "#{process.cwd()}/speech"
       "format" : "PlainText"
       'keep alive' : false
+    merge @settings, opts.settings if opts.settings?
+
+    @request = opts.request or request
+    @response = opts.response or response
 
   ###
-  # Returns the value of name app setting, where name is one of
-  # strings in the app settings table.
+  # Fetch the value of `name` setting from the app settings table.
+  # @return the value of name app setting
   ###
   get : ( name ) => @settings[ name ]
 
@@ -106,7 +125,7 @@ class App
       layer = stack[ index++ ]
 
       # all done
-      return defer done, err if !layer
+      return defer done, err, res.toObject() if !layer
 
       # route data
       #    path = parseUrl( req ).pathname or '/'
@@ -140,22 +159,22 @@ class App
   # AWS Lambda Function Handler
   # http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
   #
-  # @param {Object} request, Alexa request data
+  # @param {Object} req, Alexa request data
   # @param {Object} context, runtime information of the Lambda function that is executing.
-  # @param {cb} callback, return information to the caller. 
+  # @param {cb} callback, return information to the caller.
   # @public
   ###
-  lambda : ( request, context, cb ) =>
+  lambda : ( req, context, cb ) =>
     cb = nodeifyContext context if arguments.length < 3 # pre node 4.3 runtime
+    @run req, cb
 
-    req = Request.create type : request.request.type, original : request, app : @
-
-    out = ( err ) ->
-      return cb err if err?
-      cb null, res.toObject()
-
-    res = new Response app : @, out : out
-    @handle req, res, out
+  ###
+  #
+  ###
+  run : ( req, cb ) =>
+    req = @request type : req.request.type, original : req, app : @
+    res = @response app : @, out : cb
+    @handle req, res, cb
 
 ###*
 # Invoke a route handle.
