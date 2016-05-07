@@ -43,7 +43,10 @@ class Speech
       data = merge data, locals
       data : @template( data ), format : @format
 
-speech = ( opts ) -> new Speech opts
+speech = ( opts ) -> 
+  new Speech opts
+  .render opts.context
+  
 speech.Speech = Speech
 
 module.exports = speech

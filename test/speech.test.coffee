@@ -1,6 +1,6 @@
 should = require( "should" )
 assert = require( "assert" )
-Speech = require( '../lib/Speech' )
+renderer = require( '../lib/Renderer' )
 alexpress = require( '../index' )
 path = require 'path'
 
@@ -12,8 +12,9 @@ gettysburg = "Four score and seven years ago our fathers brought forth on this c
 describe "Speech", ->
 
   it "load a template", ( done ) ->
-    s = new Speech name : "gettysburg", app : app
-    s.render when : "Four score and seven years", what : "Liberty"
+    locals = when : "Four score and seven years", what : "Liberty"
+
+    renderer name : "gettysburg", app : app, context : locals
     .then ( x ) ->
       x.format.should.equal 'PlainText'
       x.data.should.equal gettysburg

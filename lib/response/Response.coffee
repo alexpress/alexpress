@@ -1,6 +1,7 @@
+Promise = require 'bluebird'
 OutputSpeech = require './../outputSpeech/index'
 Card = require './../card/index'
-speech = require './../Speech'
+renderer = require './../Renderer'
 merge = require 'merge'
 EventEmitter = require( 'events' ).EventEmitter
 makeProps = require './../util/makeProps'
@@ -96,7 +97,14 @@ module.exports = class Response extends EventEmitter
     @end()
 
   render : ( speechName, promptName, locals ) =>
-    if typeof promptName is 'object'
+    if typeof speechName is 'object'
+      opts = speechName
+      speechName = opts.speech
+      promptName = opts.prompt
+      locals = opts.locals
+      title = opts.title
+      contentName = opts.content
+    else if typeof promptName is 'object'
       locals = promptName
       promptName = undefined
 
@@ -104,16 +112,19 @@ module.exports = class Response extends EventEmitter
     merge context, @locals
     merge context, locals
 
-    speech name : speechName, app : @app
-    .render( context ).then ( speech ) =>
-      return { speech : speech } unless promptName?
-
-      speech name : promptName, app : @app
-      .render( context ).then ( prompt ) =>
-        { speech : speech, prompt : prompt }
-
-    .then ( x ) =>
-      @format x.speech.format, x.prompt.format
+    values = {}
+    p = if contentName? then @_renderer( contentName, context ) else Promise.resolve()
+    p.then ( card ) =>
+      values.card = card if contentName?
+      @_renderer speechName, context
+    .then ( speech ) =>
+      values.speech = speech
+      @_renderer promptName, context if promptName?
+    .then ( prompt ) =>
+      values.prompt = prompt if promptName?
+    .then =>
+      @format values.speech.format, values.prompt?.format
+      @simpleCard title, values.card.data if values.card?
       @send x.speech.data, x.prompt.data
 
   end : =>
@@ -153,3 +164,6 @@ module.exports = class Response extends EventEmitter
     obj.value str
     @
 
+  _renderer : ( template, context ) =>
+    renderer name : template, app : @app, context : context
+  
