@@ -125,7 +125,7 @@ module.exports = class Response extends EventEmitter
     .then =>
       @format values.speech.format, values.prompt?.format
       @simpleCard title, values.card.data if values.card?
-      @send x.speech.data, x.prompt.data
+      @send values.speech.data, values.prompt.data
 
   end : =>
     @out null, @toObject()
