@@ -72,7 +72,7 @@ Note that urls are *not* case sensitive.
 
 Creates an alexpress application. 
 
-```cof
+```coffeescript
 alexpress = require 'alexpress'
 app = alexpress()
 ```
@@ -112,10 +112,10 @@ Entry point invoked by AWS Lambda.
 
 ##### app.run(request, callback)
 
-Runs the application. 
+Runs the application. Call this in non AWS Lambda situations.
 
-- request**  is an `{Object}` containing the Alexa request.
-- **callback** `a Function(Error error,  Object response)` used to return information to the caller.
+- **request**  is an `{Object}` containing the Alexa request.
+- **callback** a `Function(Error error,  Object response)` used to return information to the caller.
 
 ##### **app.set(name, value)**
 
@@ -130,11 +130,12 @@ Sets setting **name** to **value**. See [app settings](#application-settings).
 | `keep alive` | Boolean | Default value value for whether session should stay alive or end. | `false`                     |
 
 ##### **app.use(path, function [, function...])**
-
-Mounts the specified middleware function or functions at the specified path. If **path** is not specified, it defaults to `'/'`.
+Utilize the given middleware `handle` to the given `route`, defaulting to '/'.
+This "route" is the mount-point for the middleware, when given a
+value other than '/' the middleware is only effective when that segment
+is present in the request's pathname.
 
 > A route will match any path that follows its path immediately with a “/”. For example: app.use('/apple', ...) will match “/apple”, “/apple/images”, “/apple/images/news”, and so on.
->
 
 ```coffeescript
 app.use '/launch', (req, res, next) ->
@@ -147,7 +148,7 @@ app.use '/launch', (req, res, next) ->
     next()
 ```
 
-Since path defaults to “/”, middleware mounted without a path will be executed for every request to the app.
+Middleware mounted without a path will be executed for every request to the app.
 
 ```coffeescript
 # this will be executed for every request
@@ -156,7 +157,8 @@ app.use (req, res, next) ->
   next()
 ```
 
-Middleware functions are executed sequentially, therefore the order of inclusion is important.
+Middleware functions are executed sequentially, therefore the order of
+inclusion is important.
 
 ```coffeescript
 # this middleware will not allow the request to go beyond it

@@ -35,7 +35,7 @@ class App
 
   ###
   # Fetch the value of `name` setting from the app settings table.
-  # @return the value of name app setting
+  # @return value of `name` app setting (or undefined)
   ###
   get : ( name ) => @settings[ name ]
 

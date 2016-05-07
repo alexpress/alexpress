@@ -10,10 +10,6 @@ context = {}
 
 should.use require './ext/ext'
 
-sessionStaysActive = ( res ) -> res.response.shouldEndSession.should.equal false
-sessionEnds = ( res ) -> res.response.shouldEndSession.should.equal true
-formatIs = ( res, format ) -> res.response.outputSpeech.type.should.equal format
-
 run = ( name, done, fn ) ->
   app.lambda request( name ), context, ( err, res ) ->
     return done err if err?
@@ -29,7 +25,6 @@ describe "alexpress", ->
       run "horoscope", done, ( res ) ->
         res.version.should.equal "1.0"
         res.should.endSession()
-        sessionEnds res
 
   describe "app", ->
 
@@ -80,7 +75,7 @@ describe "alexpress", ->
     it "reprompt inline", ( done ) ->
       app.set "json spaces", 2
       app.use "/intent/amazon/help", ( req, res, next ) ->
-        res.ask [ "a", "b" ]
+        res.ask "a", "b"
 
       run "help", done, ( res ) ->
         res.should.have.repromptSpeech "b"
