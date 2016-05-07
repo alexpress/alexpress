@@ -28,14 +28,15 @@ class Speech
       dfs.readFile p
     .then ( contents ) =>
       @template = dot.template contents, null, @defs
-    .catch ( err ) ->
-      console.log err
 
   findTemplate : =>
     base = path.join @app.get( "speech" ), @name
     ex = ( n ) -> exists "#{base}.#{n}", "File"
     test = ( v ) -> v?
     pfind exts, ex, test
+    .then ( item ) =>
+      throw new Error "Failed to lookup speech #{@name}" unless item?
+      item
 
   render : ( locals ) =>
     @ready.then =>
@@ -43,10 +44,10 @@ class Speech
       data = merge data, locals
       data : @template( data ), format : @format
 
-speech = ( opts ) -> 
+speech = ( opts ) ->
   new Speech opts
   .render opts.context
-  
+
 speech.Speech = Speech
 
 module.exports = speech

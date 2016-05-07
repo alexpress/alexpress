@@ -1,6 +1,6 @@
 should = require( "should" )
 assert = require( "assert" )
-renderer = require( '../lib/Renderer' )
+renderer = require( '../lib/renderer' )
 alexpress = require( '../index' )
 path = require 'path'
 

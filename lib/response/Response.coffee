@@ -1,10 +1,11 @@
 Promise = require 'bluebird'
 OutputSpeech = require './../outputSpeech/index'
 Card = require './../card/index'
-renderer = require './../Renderer'
+renderer = require './../renderer'
 merge = require 'merge'
 EventEmitter = require( 'events' ).EventEmitter
 prop = require '../util/prop'
+log = require( '../util/log' ) 'Response'
 
 module.exports = class Response extends EventEmitter
 
@@ -19,7 +20,7 @@ module.exports = class Response extends EventEmitter
 
     for o in [ "app", "out" ]
       @[ o ] = opts[ o ] or throw new Error ("missing option: #{o}")
-
+    
     @req = @app.req
 
     format = @app.get "format"
@@ -92,7 +93,11 @@ module.exports = class Response extends EventEmitter
 
   ask : ( speech, prompt ) => @keepAlive( true ).send speech, prompt
 
+  renderAsk : ( speech, prompt, locals ) => @keepAlive( true ).render speech, prompt, locals
+
   tell : ( speech, prompt ) => @keepAlive( false ).send speech, prompt
+
+  renderTell : ( speech, prompt, locals ) => @keepAlive( false ).render speech, prompt, locals
 
   ssml : ( speech, prompt ) => @format( "SSML" ).send speech, prompt
 
@@ -124,7 +129,9 @@ module.exports = class Response extends EventEmitter
   end : =>
     Promise
     .all @tasks
-    .asCallback ( err ) => @out err, @toObject()
+    .asCallback ( err ) =>
+      @out err, @toObject()
+
 
   toObject : =>
     data = merge {}, @data
@@ -144,4 +151,7 @@ module.exports = class Response extends EventEmitter
     merge context, @locals
     merge context, locals
     renderer name : template, app : @app, context : context
-  
+    .catch (err) =>
+      @req.next err
+      Promise.reject err
+

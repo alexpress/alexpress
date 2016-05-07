@@ -1,3 +1,4 @@
+Promise = require 'bluebird'
 request = require './request'
 response = require './response'
 nodeifyContext = require './util/nodeify-lambda-context'
@@ -22,6 +23,8 @@ class App
   * @api public
   ###
   constructor : ( opts = {} ) ->
+    Promise.onPossiblyUnhandledRejection (err, promise) ->
+
     @route = "/"
     @stack = []
     @settings =
@@ -172,9 +175,9 @@ class App
   #
   ###
   run : ( req, cb ) =>
-    req = @request type : req.request.type, original : req, app : @
-    res = @response app : @, out : cb
-    @handle req, res, cb
+    @req = @request type : req.request.type, original : req, app : @
+    @res = @response app : @, out : cb
+    @handle @req, @res, cb
 
 ###*
 # Invoke a route handle.
