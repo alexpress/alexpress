@@ -1,7 +1,7 @@
 Promise = require 'bluebird'
-OutputSpeech = require './../outputSpeech/index'
-Card = require './../card/index'
-renderer = require './../renderer'
+OutputSpeech = require '../outputSpeech/index'
+Card = require '../card/index'
+renderer = require '../util/renderer'
 merge = require 'merge'
 EventEmitter = require( 'events' ).EventEmitter
 prop = require '../util/prop'

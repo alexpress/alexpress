@@ -1,9 +1,9 @@
 dot = require 'dot'
 merge = require 'merge'
 path = require 'path'
-dfs = require './util/dfs'
-exists = require './util/exists'
-pfind = require './util/pfind'
+dfs = require './dfs'
+exists = require './exists'
+pfind = require './pfind'
 path = require 'path'
 fs = require 'fs'
 
@@ -12,7 +12,7 @@ formats =
   ".txt" : "PlainText"
   ".ssml" : "SSML"
 
-class Speech
+class Renderer
 
   constructor : ( {@name, @app} ) ->
     @ready = @load()
@@ -44,10 +44,10 @@ class Speech
       data = merge data, locals
       data : @template( data ), format : @format
 
-speech = ( opts ) ->
-  new Speech opts
+renderer = ( opts ) ->
+  new Renderer opts
   .render opts.context
 
-speech.Speech = Speech
+renderer.Renderer = Renderer
 
-module.exports = speech
+module.exports = renderer
