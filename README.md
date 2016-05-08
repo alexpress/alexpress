@@ -55,14 +55,14 @@ app.use (req, res, next) ->
 
 ## About URLs
 
-`application.use()` mounts middleware on an (optional) url .  `alexpress` generates urls from the underlying Alexa requests  (avaible as `request.url` ) thus:
+`application.use()` mounts middleware on an (optional) url .  `alexpress` generates urls from the underlying Alexa requests  (avaible as `request.url`) thus:
 
-| Request Type                         | Url                     |                                          |
+| Request Type                         | Url                     | Details                                  |
 | ------------------------------------ | ----------------------- | ---------------------------------------- |
 | `LaunchRequest`                      | `/launch`               |                                          |
 | `SessionEndedRequest`                | `/sessionEnded`         |                                          |
-| `IntentRequest` for built-in intents | `/intent/amazon/{name}` | `AMAZON.{Name}Intent`                    |
-| `IntentRequest` for custom intents   | `/intent/{name}`        | `{Name}Intent`. Note that a trailing `Intent` in the intent's name is stripped out. |
+| `IntentRequest` for built-in intents | `/intent/amazon/{name}` | `AMAZON.{Name}Intent`. e.g. `AMAZON.HelpIntent` maps to `/intent/amazon/help`. |
+| `IntentRequest` for custom intents   | `/intent/{name}`        | `{Name}Intent`. Note that a trailing `Intent` in the intent's name is stripped out. e.g. `GetHoroscopeIntent` maps to `/intent/getHoroscope`. |
 
 Note that urls are *not* case sensitive.
 
@@ -73,8 +73,7 @@ Note that urls are *not* case sensitive.
 Creates an alexpress application. 
 
 ```coffeescript
-alexpress = require 'alexpress'
-app = alexpress()
+app = require('alexpress')()
 ```
 
 ### Application
@@ -258,6 +257,10 @@ app.use "/intent/getZodiacHoroscope", (req, res, next) ->
 
 The version specifier for the response with the value to be defined as: `“1.0”`
 
+##### **response.locals** {Map}
+
+Map of name, value pairs of locals for rendering templates.
+
 #### Methods
 
 ##### response.keepAlive([alive])
@@ -271,6 +274,10 @@ Gets or sets a flag telling the system whether the session to stay active or end
 app.use "/launch", (req, res, next) ->
 	res.keepAlive(true).send("What's your zodiac sign?")
 ```
+##### response.local(name [, value])
+
+Gets or sets the value of **name** in the response's local map.
+
 ##### response.session([name, [value]])
 
 Gets or sets the value of **name** in the response's session attribute map. 
@@ -352,7 +359,11 @@ app.use "/launch", (req, res, next) ->
 ```
 ##### response.render(speech [,prompt] \[, locals])
 
-Renders template **speech** and sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `keepAlive` must be set separetely. Template files must be located in the directory specified by the  `speech` application setting.
+##### response.renderAsk(speech [,prompt] \[, locals])
+
+##### response.renderTell(speech [,prompt] \[, locals])
+
+Renders template **speech** and sets the `outputSpeech` (and optionally, `reprompt) property of the response and sends the response. `Template files must be located in the directory specified by the  `speech` application setting. `renderAsk` and `renderTell` are `ask` and `tell` versions of `render`.
 
 ```coffeescript
 # render speech from template 'horoscope'
@@ -373,9 +384,9 @@ Template context data is merged in the following order (last wins):
 * **response.locals**
 * `locals` option to **response.render**
 
-##### response.simpleCard(title, [text])
+##### response.simpleCard(title, content)
 
-##### response.standardCard()
+##### response.standardCard(title, text [, smallImageUrl [, largeImageUrl]])
 
 ##### response.LinkAccountCard()
 
@@ -385,13 +396,15 @@ Gets or sets the format for `outputSpeech`.
 
 > The default format can be set via **app.set('format', format)** [application setting](#application-settings).
 
-##### response.repromptFormat()
+##### response.repromptFormat([format])
 
 Gets or sets the format for `reprompt`. 
 
 > The default format can be set via **app.set('format', format)** [application setting](#application-settings).
 
-##### 
+###Rendering Engine
+
+`alexpress` uses the [doT](http://olado.github.io/doT/) rendering engine.
 
 ## Reference
 
@@ -433,10 +446,5 @@ Gets or sets the format for `reprompt`.
   }
 }
 ```
-
-
-
-
-
 
 
