@@ -1,7 +1,7 @@
 Card = require './Card'
 module.exports = class LinkAccount extends Card
 
-  init : =>
+  init : ->
     # no standard props
   
 

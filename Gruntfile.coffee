@@ -1,3 +1,11 @@
+PACKAGES = [
+  'grunt-contrib-watch'
+  'grunt-contrib-coffee'
+  'grunt-contrib-clean'
+  'grunt-coffeelint'
+  'grunt-coveralls'
+]
+
 module.exports = ( grunt ) ->
 
   grunt.initConfig
@@ -5,6 +13,13 @@ module.exports = ( grunt ) ->
 
     clean :
       dist : [ "dist", "*.{js,map}", "lib/**/*.{map,js}" ]
+
+    coffeelint :
+      app : [ 'lib/**/*.coffee', "*.coffee" ]
+      
+    coveralls:
+      app:
+        src: 'coverage/lcov.info'
 
     coffee :
       options :
@@ -23,8 +38,7 @@ module.exports = ( grunt ) ->
         tasks : [ "coffee:dist" ]
         files : [ "lib/**/*coffee", "*.coffee" ]
 
-  for t in [ "contrib-watch", "contrib-coffee", "contrib-clean" ]
-    grunt.loadNpmTasks "grunt-#{t}"
+  grunt.loadNpmTasks pkg for pkg in PACKAGES
 
-  grunt.registerTask "default", [ "clean:dist", "coffee:dist" ]
+  grunt.registerTask "default", [ "coffeelint", "clean:dist", "coffee:dist" ]
 

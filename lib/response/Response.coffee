@@ -91,17 +91,23 @@ module.exports = class Response extends EventEmitter
       @standardCard title, x.data, smallImageUrl, largeImageUrl )
     @
 
-  ask : ( speech, prompt ) => @keepAlive( true ).send speech, prompt
+  ask : ( speech, prompt ) =>
+    @keepAlive( true ).send speech, prompt
 
-  renderAsk : ( speech, prompt, locals ) => @keepAlive( true ).render speech, prompt, locals
+  renderAsk : ( speech, prompt, locals ) =>
+    @keepAlive( true ).render speech, prompt, locals
 
-  tell : ( speech, prompt ) => @keepAlive( false ).send speech, prompt
+  tell : ( speech, prompt ) =>
+    @keepAlive( false ).send speech, prompt
 
-  renderTell : ( speech, prompt, locals ) => @keepAlive( false ).render speech, prompt, locals
+  renderTell : ( speech, prompt, locals ) =>
+    @keepAlive( false ).render speech, prompt, locals
 
-  ssml : ( speech, prompt ) => @format( "SSML" ).send speech, prompt
+  ssml : ( speech, prompt ) =>
+    @format( "SSML" ).send speech, prompt
 
-  plainText : ( speech, prompt ) => @format( "PlainText" ).send speech, prompt
+  plainText : ( speech, prompt ) =>
+    @format( "PlainText" ).send speech, prompt
 
   renderReprompt : ( promptName, locals ) =>
     @tasks.push( @doRender promptName, locals

@@ -16,13 +16,14 @@ module.exports = class Request extends TypedClass
 
     @init()
 
-  init : =>
+  init : ->
 
   slots : => @_slots
 
   slot : ( name ) => @_slots[ name ]?.value
 
-  session : ( name ) => if name? then @sessionAttributes[ name ] else @sessionAttributes
+  session : ( name ) =>
+    if name? then @sessionAttributes[ name ] else @sessionAttributes
 
   @create : ( opt ) -> super opt, __dirname
     

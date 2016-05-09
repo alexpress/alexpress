@@ -2,6 +2,7 @@
 `alexpress` is an `express` like API for Amazon alexa custom skills.
 
 [![Build Status](https://travis-ci.org/alexpress/alexpress.svg?branch=master)](https://travis-ci.org/alexpress/alexpress)
+[![Coverage Status](https://coveralls.io/repos/github/alexpress/alexpress/badge.svg?branch=master)](https://coveralls.io/github/alexpress/alexpress?branch=master)
 
 > The [Alexa Skills Kit](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit) enables you to give Alexa new abilities by building a cloud-based service. This service can be either a web service or an AWS [Lambda](http://aws.amazon.com/lambda/) function.
 

@@ -4,7 +4,9 @@ response = require './response'
 nodeifyContext = require './util/nodeify-lambda-context'
 merge = require 'merge'
 
-defer = setImmediate or ( fn ) -> process.nextTick fn.bind.apply( fn, arguments )
+#noinspection JSUnresolvedVariable
+defer = setImmediate or ( fn ) ->
+  process.nextTick fn.bind.apply( fn, arguments )
 
 ###*
 * @class App
@@ -18,8 +20,8 @@ class App
   * @param {Object} `opts` (optional) config information (default: {})
   *
   *   * `settings`    {Object} with app settings (default: {})
-  *   * `request`     The {Function} to call to create a request object (default `request`)
-  *   * `response`    The {Function} to call to create a response object (default `response`)
+  *   * `request`     The {Function} to call to create a request object
+  *   * `response`    The {Function} to call to create a response object
   * @api public
   ###
   constructor : ( opts = {} ) ->
@@ -141,7 +143,8 @@ class App
       route = layer.route
 
       # skip this layer if the route doesn't match
-      return next( err ) if path.toLowerCase().substr( 0, route.length ) != route.toLowerCase()
+      if path.toLowerCase().substr( 0, route.length ) != route.toLowerCase()
+        return next( err )
 
       # skip if route match does not border "/", ".", or end
       c = path[ route.length ]
@@ -150,7 +153,8 @@ class App
       # trim off the part of the url that matches the route
       if route.length != 0 and route != '/'
         removed = route
-        req.url = protohost + req.url.substr( protohost.length + removed.length )
+        req.url = protohost +
+            req.url.substr( protohost.length + removed.length )
 
         # ensure leading slash
         if !protohost and req.url[ 0 ] != '/'
@@ -168,7 +172,8 @@ class App
   # http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-handler.html
   #
   # @param {Object} req, Alexa request data
-  # @param {Object} context, runtime information of the Lambda function that is executing.
+  # @param {Object} context, runtime information of the Lambda
+  #                 function that is executing.
   # @param {cb} callback, return information to the caller.
   # @public
   ###
@@ -181,14 +186,14 @@ class App
   ###
   run : ( req, cb ) =>
     @req = @request type : req.request.type, original : req, app : @
-    
+
     out = ( err ) =>
       next = ( e ) => cb e, @res.toObject()
       return @_last err, @req, @res, next if @_last
       next err
-     
+
     @res = @response app : @, out : out
-    @handle @req, @res, out 
+    @handle @req, @res, out
 
 ###*
 # Invoke a route handle.
