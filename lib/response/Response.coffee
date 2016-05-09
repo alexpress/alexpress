@@ -20,7 +20,7 @@ module.exports = class Response extends EventEmitter
 
     for o in [ "app", "out" ]
       @[ o ] = opts[ o ] or throw new Error ("missing option: #{o}")
-    
+
     @req = @app.req
 
     format = @app.get "format"
@@ -130,13 +130,13 @@ module.exports = class Response extends EventEmitter
     Promise
     .all @tasks
     .asCallback ( err ) =>
-      @out err, @toObject()
+      @out err
 
 
   toObject : =>
     data = merge {}, @data
     os = OutputSpeech.create type : @format(), value : @speech()
-    merge data.response, outputSpeech : os.toObject()
+    merge data.response, outputSpeech : os.toObject() if os.isValid()
 
     if @reprompt()
       ros = OutputSpeech.create type : @repromptFormat(), value : @reprompt()
@@ -151,7 +151,7 @@ module.exports = class Response extends EventEmitter
     merge context, @locals
     merge context, locals
     renderer name : template, app : @app, context : context
-    .catch (err) =>
+    .catch ( err ) =>
       @req.next err
       Promise.reject err
 

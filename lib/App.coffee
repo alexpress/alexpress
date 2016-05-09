@@ -23,8 +23,9 @@ class App
   * @api public
   ###
   constructor : ( opts = {} ) ->
-    Promise.onPossiblyUnhandledRejection (err, promise) ->
+    Promise.onPossiblyUnhandledRejection ( err, promise ) ->
 
+    @_last = undefined
     @route = "/"
     @stack = []
     @settings =
@@ -48,6 +49,10 @@ class App
   ###
   set : ( name, value ) =>
     @settings[ name ] = value
+    @
+
+  last : ( cb ) =>
+    @_last = cb
     @
 
   ###
@@ -176,8 +181,14 @@ class App
   ###
   run : ( req, cb ) =>
     @req = @request type : req.request.type, original : req, app : @
-    @res = @response app : @, out : cb
-    @handle @req, @res, cb
+    
+    out = ( err ) =>
+      next = ( e ) => cb e, @res.toObject()
+      return @_last err, @req, @res, next if @_last
+      next err
+     
+    @res = @response app : @, out : out
+    @handle @req, @res, out 
 
 ###*
 # Invoke a route handle.

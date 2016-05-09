@@ -14,5 +14,8 @@ module.exports = class BaseObject extends TypedClass
           @data[ field ] = value
           @
 
-  toObject : => @data
+  isValid : => true
+
+  toObject : =>
+    @data
 

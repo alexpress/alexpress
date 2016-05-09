@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for alexpress/lib/response/Response.coffee</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">alexpress/lib/response/</a> Response.coffee
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">67.01% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>65/97</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>13/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68.97% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>20/29</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.76% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>61/85</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">50×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">33×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">Promise = require 'bluebird'
+OutputSpeech = require '../outputSpeech/index'
+Card = require '../card/index'
+renderer = require '../util/renderer'
+merge = require 'merge'
+EventEmitter = require( 'events' ).EventEmitter
+prop = require '../util/prop'
+log = require( '../util/log' ) 'Response'
+&nbsp;
+module.exports = class Response extends EventEmitter
+&nbsp;
+  constructor : ( opts = {} ) -&gt;
+    @locals = {}
+    @tasks = []
+&nbsp;
+    @data =
+      version : "1.0"
+      sessionAttributes : {}
+      response : {}
+&nbsp;
+    for o in [ "app", "out" ]
+      @[ o ] = opts[ o ] or throw new Error (<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >"missing option: #{<span class="cstat-no" title="statement not covered" >o</span>}</span>"</span>)
+&nbsp;
+    @req = @app.req
+&nbsp;
+    format = @app.get "format"
+&nbsp;
+    prop @, name : "format", initial : format
+    prop @, name : "repromptFormat", initial : format
+    prop @, name : "version", initial : @data.version, readOnly : true
+    prop @, name : "card"
+    prop @, name : "speech"
+    prop @, name : "reprompt"
+&nbsp;
+    prop @,
+      name : "keepAlive"
+      initial : @app.get( 'keep alive' )
+      getter : =&gt; !@data.response.shouldEndSession
+      setter : ( v ) =&gt; @data.response.shouldEndSession = !v
+&nbsp;
+<span class="fstat-no" title="function not covered" >  local : ( name, value ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    return @locals[ name ]</span> if arguments.length &lt; 2</span>
+<span class="cstat-no" title="statement not covered" >    @locals[ name ] = value</span>
+<span class="cstat-no" title="statement not covered" >    @</span>
+&nbsp;
+  session : ( name, value ) =&gt;
+    sa = @data.sessionAttributes
+    <span class="missing-if-branch" title="else path not taken" >E</span>if arguments.length is 2
+      sa[ name ] = value
+      return @
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    t = typeof name</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    return sa</span> if t is 'undefined'</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    return sa[ k ] = v</span> for own k,v of name</span> if t is 'object'</span>
+<span class="cstat-no" title="statement not covered" >    sa</span>[ name ]
+&nbsp;
+  simpleCard : ( title, content ) =&gt;
+    @card( Card.create type : "Simple"
+      .title title
+      .content content
+    )
+&nbsp;
+  standardCard : ( title, text, smallImageUrl, largeImageUrl ) =&gt;
+    @card( Card.create type : "Standard"
+      .title title
+      .text text
+      .smallImageUrl smallImageUrl
+      .largeImageUrl largeImageUrl
+    )
+&nbsp;
+  linkAccountCard : () =&gt;
+    @card Card.create type : "LinkAccount"
+    .keepAlive false # user must use app for account linking
+&nbsp;
+<span class="fstat-no" title="function not covered" >  renderSimpleCard : ( title, content, locals ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    @tasks.push( @doRender content, locals</span>
+    .then <span class="fstat-no" title="function not covered" >( x ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >      @simpleCard title, x.data</span> )
+<span class="cstat-no" title="statement not covered" >    @</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  renderStandardCard : ( title, text, smallImageUrl, largeImageUrl, locals ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    if typeof smallImageUrl is 'object'</span>
+<span class="cstat-no" title="statement not covered" >      locals = smallImageUrl</span>
+<span class="cstat-no" title="statement not covered" >      smallImageUrl = largeImageUrl = undefined</span>
+<span class="cstat-no" title="statement not covered" >    if typeof largemageUrl is 'object'</span>
+<span class="cstat-no" title="statement not covered" >      locals = largeImageUrl</span>
+<span class="cstat-no" title="statement not covered" >      largeImageUrl = undefined</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    @tasks.push( @doRender text, locals</span>
+    .then <span class="fstat-no" title="function not covered" >( x ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >      @standardCard title, x.data, smallImageUrl, largeImageUrl</span> )
+<span class="cstat-no" title="statement not covered" >    @</span>
+&nbsp;
+  ask : ( speech, prompt ) =&gt; @keepAlive( true ).send speech, prompt
+&nbsp;
+  renderAsk : ( speech, prompt, locals ) =&gt; @keepAlive( true ).render speech, prompt, locals
+&nbsp;
+  tell : ( speech, prompt ) =&gt; @keepAlive( false ).send speech, prompt
+&nbsp;
+  renderTell : ( speech, prompt, locals ) =&gt; @keepAlive( false ).render speech, prompt, locals
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ssml : ( speech, prompt ) =</span>&gt; <span class="cstat-no" title="statement not covered" >@format( "SSML" ).send speech, prompt</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  plainText : ( speech, prompt ) =</span>&gt; <span class="cstat-no" title="statement not covered" >@format( "PlainText" ).send speech, prompt</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  renderReprompt : ( promptName, locals ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    @tasks.push( @doRender promptName, locals</span>
+    .then <span class="fstat-no" title="function not covered" >( prompt ) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >      @reprompt prompt.data, prompt.format</span> )
+<span class="cstat-no" title="statement not covered" >    @</span>
+&nbsp;
+  send : ( speech, prompt ) =&gt;
+    @reprompt prompt if prompt?
+    @speech speech if speech?
+    @end()
+&nbsp;
+  render : ( speechName, promptName, locals ) =&gt;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if typeof promptName is 'object'
+      locals = promptName
+      promptName = undefined
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>@renderReprompt promptName, locals</span> if promptName?
+&nbsp;
+    @doRender speechName, locals
+    .then ( speech ) =&gt;
+      @format speech.format
+      .send speech.data
+&nbsp;
+  end : =&gt;
+    Promise
+    .all @tasks
+    .asCallback ( err ) =&gt;
+      @out err
+&nbsp;
+&nbsp;
+  toObject : =&gt;
+    data = merge {}, @data
+    os = OutputSpeech.create type : @format(), value : @speech()
+    merge data.response, outputSpeech : os.toObject() if os.isValid()
+&nbsp;
+    if @reprompt()
+      ros = OutputSpeech.create type : @repromptFormat(), value : @reprompt()
+      merge data.response, { reprompt : { outputSpeech : ros.toObject() } }
+&nbsp;
+    merge data.response, card : @card().toObject() if @card()?
+&nbsp;
+    data
+&nbsp;
+  doRender : ( template, locals ) =&gt;
+    context = merge {}, @data.sessionAttributes
+    merge context, @locals
+    merge context, locals
+    renderer name : template, app : @app, context : context
+    .catch ( err ) =&gt;
+      @req.next err
+      Promise.reject err
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 09 2016 18:48:40 GMT-0400 (EDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>
